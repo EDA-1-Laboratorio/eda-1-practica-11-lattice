@@ -23,57 +23,106 @@ import random
 def busqueda_binaria(arr: list[int], objetivo: int,
                      lo: int = 0, hi: int = None) -> int:
     """
-    Busca 'objetivo' en arr[lo..hi] (extremos inclusivos).
+    Busca 'objetivo' en arr[lo..hi] usando búsqueda binaria recursiva.
 
-    Precondición : arr está ordenado de menor a mayor.
-    Retorna      : el índice de 'objetivo' si existe, o -1 si no está.
-    Complejidad  : O(log n) en el peor caso.
+    Precondición:
+        arr está ordenado de menor a mayor.
+
+    Retorna:
+        El índice de 'objetivo' si existe, o -1 si no está.
     """
+
     if hi is None:
         hi = len(arr) - 1
 
-    # PASO BASE
-    # TODO: si lo > hi, el subarreglo está vacío → devuelve -1
+    # Paso base: el subarreglo está vacío
+    if lo > hi:
+        return -1
 
+    # Punto medio
     mid = (lo + hi) // 2
 
-    # TODO: si arr[mid] == objetivo, devuelve mid
+    # Caso encontrado
+    if arr[mid] == objetivo:
+        return mid
 
-    # HIPÓTESIS INDUCTIVA:
-    # Supongo que busqueda_binaria(arr, objetivo, ...) devuelve correctamente
-    # el índice del objetivo en el subarreglo indicado, o -1 si no existe.
+    # Buscar en la mitad izquierda
+    if objetivo < arr[mid]:
+        return busqueda_binaria(arr, objetivo, lo, mid - 1)
 
-    # PASO RECURSIVO
-    # TODO: si objetivo < arr[mid], busca en la mitad izquierda (lo..mid-1)
-    # TODO: si objetivo > arr[mid], busca en la mitad derecha  (mid+1..hi)
+    # Buscar en la mitad derecha
+    return busqueda_binaria(arr, objetivo, mid + 1, hi)
 
+
+# =========================
+# Pruebas mínimas
+# =========================
+
+A = [2, 5, 8, 12, 16, 23, 38, 45, 56, 72, 91]
+
+assert busqueda_binaria(A, 23) == 5
+assert busqueda_binaria(A, 16) == 4
+assert busqueda_binaria(A, 2) == 0
+assert busqueda_binaria(A, 91) == 10
+assert busqueda_binaria(A, 99) == -1
+assert busqueda_binaria(A, 1) == -1
+assert busqueda_binaria([], 5) == -1
+
+print("Todas las pruebas pasaron.")
 
 # ---------------------------------------------------------------------------
 # Problema B – Versión instrumentada con contador de comparaciones
 # ---------------------------------------------------------------------------
-
-def busqueda_binaria_conteo(arr: list[int], objetivo: int,
-                             lo: int, hi: int,
-                             conteo: list[int]) -> int:
+def busqueda_binaria(arr: list[int], objetivo: int,
+                     lo: int = 0, hi: int = None) -> int:
     """
-    Igual que busqueda_binaria, pero incrementa conteo[0] en cada
-    comparación con arr[mid].
+    Busca 'objetivo' en arr[lo..hi] usando búsqueda binaria recursiva.
 
-    Uso:
-        conteo = [0]
-        idx = busqueda_binaria_conteo(arr, objetivo, 0, len(arr)-1, conteo)
-        print(f"Índice: {idx}, comparaciones: {conteo[0]}")
+    Precondición:
+        arr está ordenado de menor a mayor.
+
+    Retorna:
+        El índice de 'objetivo' si existe, o -1 si no está.
     """
-    # PASO BASE
-    # TODO
 
+    if hi is None:
+        hi = len(arr) - 1
+
+    # Paso base: el subarreglo está vacío
+    if lo > hi:
+        return -1
+
+    # Cálculo del punto medio
     mid = (lo + hi) // 2
 
-    conteo[0] += 1          # comparación con arr[mid]
-    # TODO: si arr[mid] == objetivo ...
+    # Si encontramos el objetivo
+    if arr[mid] == objetivo:
+        return mid
 
-    # TODO: paso recursivo (no olvides pasar 'conteo')
+    # Buscar en la mitad izquierda
+    if objetivo < arr[mid]:
+        return busqueda_binaria(arr, objetivo, lo, mid - 1)
 
+    # Buscar en la mitad derecha
+    else:
+        return busqueda_binaria(arr, objetivo, mid + 1, hi)
+
+
+# =========================
+# Pruebas mínimas
+# =========================
+
+A = [2, 5, 8, 12, 16, 23, 38, 45, 56, 72, 91]
+
+assert busqueda_binaria(A, 23) == 5
+assert busqueda_binaria(A, 16) == 4
+assert busqueda_binaria(A, 2) == 0
+assert busqueda_binaria(A, 91) == 10
+assert busqueda_binaria(A, 99) == -1
+assert busqueda_binaria(A, 1) == -1
+assert busqueda_binaria([], 5) == -1
+
+print("Todas las pruebas pasaron.")
 
 # ---------------------------------------------------------------------------
 # Utilidades

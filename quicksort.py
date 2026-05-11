@@ -21,40 +21,24 @@ import random
 # ---------------------------------------------------------------------------
 
 def particiona(arr: list, lo: int, hi: int) -> int:
-    """
-    Reorganiza arr[lo..hi] en torno al pivote arr[hi] (esquema Lomuto).
-
-    Postcondición:
-        - arr[p] == pivote, donde p es el índice devuelto.
-        - arr[lo..p-1] <= arr[p] <= arr[p+1..hi].
-
-    Invariante del ciclo:
-        En todo momento: arr[lo..i] <= pivote  y  arr[i+1..j-1] > pivote.
-
-    Retorna el índice final del pivote.
-    """
     pivot = arr[hi]
     i = lo - 1
 
     for j in range(lo, hi):
-        # TODO: si arr[j] <= pivot:
-        #           incrementa i
-        #           intercambia arr[i] con arr[j]
-        pass
+        if arr[j] <= pivot:
+            i += 1
+            arr[i], arr[j] = arr[j], arr[i]
 
-    # TODO: coloca el pivote en su posición definitiva
-    #       intercambia arr[i + 1] con arr[hi]
-    # TODO: devuelve i + 1
+    # colocar pivote en su posición final
+    arr[i + 1], arr[hi] = arr[hi], arr[i + 1]
+
+    return i + 1
 
 
 def particiona_aleatoria(arr: list, lo: int, hi: int) -> int:
-    """
-    Igual que particiona, pero elige el pivote al azar dentro de arr[lo..hi].
-    Esto evita el peor caso O(n²) en arreglos ya ordenados.
-    """
-    # TODO: elige un índice aleatorio entre lo y hi (inclusive)
-    # TODO: intercambia arr[idx] con arr[hi]
-    # TODO: llama a particiona(arr, lo, hi) y devuelve su resultado
+    idx = random.randint(lo, hi)
+    arr[idx], arr[hi] = arr[hi], arr[idx]
+    return particiona(arr, lo, hi)
 
 
 # ---------------------------------------------------------------------------
@@ -62,78 +46,72 @@ def particiona_aleatoria(arr: list, lo: int, hi: int) -> int:
 # ---------------------------------------------------------------------------
 
 def quicksort(arr: list, lo: int = 0, hi: int = None) -> None:
-    """
-    Ordena arr[lo..hi] en su lugar usando quick sort con partición de Lomuto.
-
-    Modifica arr directamente (in-place). No devuelve nada.
-    Complejidad: O(n log n) promedio, O(n²) peor caso.
-    """
     if hi is None:
         hi = len(arr) - 1
 
     # PASO BASE
-    # TODO: si lo >= hi, el subarreglo tiene 0 o 1 elemento → ya está ordenado
-
-    # HIPÓTESIS INDUCTIVA:
-    # Supongo que quicksort(arr, lo, p-1) ordena correctamente arr[lo..p-1] y
-    # que quicksort(arr, p+1, hi) ordena correctamente arr[p+1..hi].
-    # El pivote arr[p] ya está en su posición definitiva tras la partición,
-    # por lo que el arreglo completo arr[lo..hi] queda ordenado.
+    if lo >= hi:
+        return
 
     # PASO RECURSIVO
-    # TODO: 1. p = particiona(arr, lo, hi)
-    # TODO: 2. quicksort(arr, lo, p - 1)
-    # TODO: 3. quicksort(arr, p + 1, hi)
+    p = particiona(arr, lo, hi)
 
+    quicksort(arr, lo, p - 1)
+    quicksort(arr, p + 1, hi)
 
 def quicksort_aleatorio(arr: list, lo: int = 0, hi: int = None) -> None:
-    """
-    Igual que quicksort, pero usa particiona_aleatoria para evitar el peor caso.
-    """
     if hi is None:
         hi = len(arr) - 1
 
-    # TODO: mismo esquema que quicksort, pero llamando a particiona_aleatoria
+    # PASO BASE
+    if lo >= hi:
+        return
 
+    # PASO RECURSIVO con pivote aleatorio
+    p = particiona_aleatoria(arr, lo, hi)
 
+    quicksort_aleatorio(arr, lo, p - 1)
+    quicksort_aleatorio(arr, p + 1, hi)
+def verificar_ordenamiento(n: int, semilla: int = 42) -> bool:
+    random.seed(semilla)
+    arr = [random.randint(-1000, 1000) for _ in range(n)]
+    referencia = sorted(arr)
+    quicksort(arr)
+    return arr == referencia
+
+assert verificar_ordenamiento(0)
+assert verificar_ordenamiento(1)
+assert verificar_ordenamiento(2)
+assert verificar_ordenamiento(100)
+assert verificar_ordenamiento(10_000)
+print("Quick sort correcto en todos los casos.")
 # ---------------------------------------------------------------------------
 # Problema D – Versión instrumentada con contador de comparaciones
 # ---------------------------------------------------------------------------
 
 def _particiona_conteo(arr: list, lo: int, hi: int, conteo: list) -> int:
-    """
-    Igual que particiona, pero incrementa conteo[0] en cada comparación
-    arr[j] <= pivot dentro del ciclo.
-    """
-    pivot = arr[hi]
+    pivote = arr[hi]
     i = lo - 1
-
+    
     for j in range(lo, hi):
-        conteo[0] += 1          # comparación con el pivote
-        if arr[j] <= pivot:
+        conteo[0] += 1 
+        if arr[j] <= pivote:
             i += 1
             arr[i], arr[j] = arr[j], arr[i]
-
+            
     arr[i + 1], arr[hi] = arr[hi], arr[i + 1]
     return i + 1
 
-
 def quicksort_conteo(arr: list, lo: int, hi: int, conteo: list) -> None:
-    """
-    Igual que quicksort, pero acumula el número de comparaciones en conteo[0].
 
-    Uso:
-        arr = [...]
-        conteo = [0]
-        quicksort_conteo(arr, 0, len(arr) - 1, conteo)
-        print(f"Comparaciones: {conteo[0]}")
-    """
     if lo >= hi:
         return
 
     p = _particiona_conteo(arr, lo, hi, conteo)
+    
     quicksort_conteo(arr, lo, p - 1, conteo)
     quicksort_conteo(arr, p + 1, hi, conteo)
+
 
 
 # ---------------------------------------------------------------------------
