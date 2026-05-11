@@ -72,8 +72,19 @@ def quicksort_aleatorio(arr: list, lo: int = 0, hi: int = None) -> None:
 
     quicksort_aleatorio(arr, lo, p - 1)
     quicksort_aleatorio(arr, p + 1, hi)
+def verificar_ordenamiento(n: int, semilla: int = 42) -> bool:
+    random.seed(semilla)
+    arr = [random.randint(-1000, 1000) for _ in range(n)]
+    referencia = sorted(arr)
+    quicksort(arr)
+    return arr == referencia
 
-
+assert verificar_ordenamiento(0)
+assert verificar_ordenamiento(1)
+assert verificar_ordenamiento(2)
+assert verificar_ordenamiento(100)
+assert verificar_ordenamiento(10_000)
+print("Quick sort correcto en todos los casos.")
 # ---------------------------------------------------------------------------
 # Problema D – Versión instrumentada con contador de comparaciones
 # ---------------------------------------------------------------------------
